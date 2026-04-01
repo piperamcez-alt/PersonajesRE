@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Resident Evil Universe — Fan page educativa sobre la saga de survival horror de Capcom. Personajes, juegos, villanos y cronología.">
+  <meta name="author" content="INACAP Maipú">
+  <title>Resident Evil Universe</title>
+
+  <!-- Fuente -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Hoja de estilos -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ══ LOADER INICIAL ══ -->
+  <div id="umbrella-loader" role="status" aria-label="Cargando página">
+    <svg class="umbrella-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="50" cy="50" r="48" fill="#cc0000"/>
+      <rect x="46" y="10" width="8" height="80" fill="white"/>
+      <rect x="10" y="46" width="80" height="8" fill="white"/>
+      <circle cx="50" cy="50" r="10" fill="#cc0000"/>
+    </svg>
+    <p class="loader-text">CARGANDO DATOS...</p>
+  </div>
+
+  <!-- ══ LLUVIA DE SANGRE (decorativo) ══ -->
+  <div id="blood-rain" aria-hidden="true"></div>
+
+  <!-- ══════════════════════════════════
+       ENCABEZADO DEL SITIO
+  ══════════════════════════════════ -->
+  <header class="site-header">
+    <h1 class="glitch">
+      <img
+        src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Umbrella_Corporation_logo.svg/960px-Umbrella_Corporation_logo.svg.png"
+        alt="Logo Umbrella Corporation"
+        class="site-logo"
+      >
+      Resident Evil Personajes
+    </h1>
+
+    <nav class="site-nav" aria-label="Navegación principal">
+      <ul>
+        <li><a href="#">Inicio</a></li>
+        <li><a href="#historia">Historia</a></li>
+        <li><a href="#juegos">Juegos</a></li>
+        <li><a href="#cronologia">Cronología</a></li>
+        <li><a href="#villanos">Villanos</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- ══════════════════════════════════
+       CARRUSEL 3D
+       Más imágenes de la saga RE
+  ══════════════════════════════════ -->
+  <section aria-label="Galería de imágenes Resident Evil">
+    <div class="carousel-3d-wrap">
+      <div class="carousel-3d" id="carousel3d">
+
+        <div class="slide-3d" data-i="0">
+          <img src="https://static0.cbrimages.com/wordpress/wp-content/uploads/2020/03/Featured-image-32.jpg?w=1600"
+               alt="Resident Evil — arte oficial">
+        </div>
+
+        <div class="slide-3d" data-i="1">
+          <img src="https://images.wallpapersden.com/image/download/resident-evil-2-game_a2drbWmUmZqaraWkpJRobWllrWdma2U.jpg"
+               alt="Resident Evil 2 Remake">
+        </div>
+
+        <div class="slide-3d" data-i="2">
+          <img src="https://preview.redd.it/yesterday-i-posted-my-re4-remake-cover-i-did-inspired-by-v0-vydj7dfyxdta1.jpg?auto=webp&s=c36b768dcad7513674b772a3be53eb8722d2b24d"  #cambiar
+               alt="Resident Evil 4 Remake — Leon,S, Kennedy">
+        </div>
+
+        <div class="slide-3d" data-i="3">
+          <img src="https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2050650/header.jpg"
+               alt="Resident Evil 4 Remake">
+        </div>
+
+        <div class="slide-3d" data-i="4">
+          <img src="https://image.api.playstation.com/vulcan/ap/rnd/202101/0812/FkzwjnJknkrFlozkTdeQBMub.png"
+               alt="Resident Evil Village">
+        </div>
+
+        <div class="slide-3d" data-i="5">
+          <img src="https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/418370/header.jpg"
+               alt="Resident Evil 7 Biohazard">
+        </div>
+
+        <div class="slide-3d" data-i="6">
+          <img src="https://image.api.playstation.com/cdn/UP0102/CUSA04437_00/xAtMOkY23P4b0hj4gy8ZMiBgIcknZjKM.png"
+               alt="Resident Evil 5">
+        </div>
+
+      </div>
+
+      <canvas id="carousel-canvas" aria-hidden="true"></canvas>
+      <button class="btn-3d prev-3d" aria-label="Imagen anterior">&#10094;</button>
+      <button class="btn-3d next-3d" aria-label="Imagen siguiente">&#10095;</button>
+      <div class="dots-3d" id="dots3d" role="tablist" aria-label="Seleccionar imagen"></div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════
+       CONTADORES
+  ══════════════════════════════════ -->
+  <section class="stats-section" aria-label="Estadísticas de la saga">
+    <div class="stat">
+      <span class="stat-number" data-target="11">0</span>
+      <span class="stat-label">JUEGOS PRINCIPALES</span>
+    </div>
+    <div class="stat">
+      <span class="stat-number" data-target="22">0</span>
+      <span class="stat-label">PERSONAJES</span>
+    </div>
+    <div class="stat">
+      <span class="stat-number" data-target="29">0</span>
+      <span class="stat-label">AÑOS DE HISTORIA</span>
+    </div>
+    <div class="stat">
+      <span class="stat-number" data-target="8">0</span>
+      <span class="stat-label">VILLANOS ICÓNICOS</span>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════
+       HISTORIA
+  ══════════════════════════════════ -->
+  <section class="story-section" id="historia" aria-labelledby="historia-titulo">
+    <h2 id="historia-titulo">Historia</h2>
+    <p>
+      En 1998, la Corporación Umbrella libera un virus en Raccoon City, provocando una serie de
+      asesinatos y brotes zombis. El equipo S.T.A.R.S. investiga en las Montañas Arklay y termina
+      atrapado en una mansión infestada de criaturas, donde descubren laboratorios secretos de
+      armas biológicas.
+    </p>
+    <br>
+    <p>
+      Tras sobrevivir, personajes como Jill Valentine, Chris Redfield y Rebecca Chambers intentan
+      alertar a las autoridades sin éxito. Mientras el virus se expande, Leon S. Kennedy y Claire
+      Redfield logran escapar junto a Sherry Birkin.
+    </p>
+    <br>
+    <p>
+      Finalmente, Raccoon City es destruida con un misil nuclear para contener el brote, y los
+      sobrevivientes se separan para seguir luchando contra el bioterrorismo y lo que queda de
+      Umbrella.
+    </p>
+  </section>
+
+  <!-- ══════════════════════════════════
+       JUEGOS — buscador + grid de cards
+  ══════════════════════════════════ -->
+  <section class="games-section" id="juegos" aria-labelledby="juegos-titulo">
+    <h2 class="section-heading" id="juegos-titulo">Juegos de la Saga</h2>
+
+    <div class="search-wrap" role="search">
+      <label for="searchInput" class="sr-only">Buscar juego</label>
+      <input
+        type="search"
+        id="searchInput"
+        placeholder="🔍  Buscar juego..."
+        aria-label="Buscar juego por nombre"
+      >
+    </div>
+
+    <!-- Las cards se generan dinámicamente desde main.js -->
+    <div class="games-grid" id="games-grid" role="list" aria-label="Lista de juegos"></div>
+  </section>
+
+  <!-- ══════════════════════════════════
+       CRONOLOGÍA
+  ══════════════════════════════════ -->
+  <section class="timeline-section" id="cronologia" aria-labelledby="cronologia-titulo">
+    <h2 id="cronologia-titulo">Cronología Interactiva</h2>
+    <!-- Items generados desde main.js -->
+    <ol class="timeline" id="timeline" aria-label="Cronología de Resident Evil"></ol>
+  </section>
+
+  <!-- ══════════════════════════════════
+       VILLANOS
+  ══════════════════════════════════ -->
+  <section class="villains-section" id="villanos" aria-labelledby="villanos-titulo">
+    <h2 id="villanos-titulo">Villanos Icónicos</h2>
+    <!-- Cards generadas desde main.js -->
+    <div class="villains-grid" id="villains-grid" role="list" aria-label="Villanos principales"></div>
+  </section>
+
+  <!-- ══════════════════════════════════
+       MODAL DE JUEGO
+  ══════════════════════════════════ -->
+  <div
+    id="game-modal"
+    class="modal-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-title"
+    aria-describedby="modal-summary-text"
+  >
+    <article class="modal-box">
+
+      <!-- Loader interno del modal -->
+      <div id="modal-loader" role="status" aria-label="Cargando información del juego">
+        <svg class="umbrella-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="50" cy="50" r="48" fill="#cc0000"/>
+          <rect x="46" y="10" width="8" height="80" fill="white"/>
+          <rect x="10" y="46" width="80" height="8" fill="white"/>
+          <circle cx="50" cy="50" r="10" fill="#cc0000"/>
+        </svg>
+        <p class="loader-text">ACCEDIENDO...</p>
+      </div>
+
+      <button class="modal-close" aria-label="Cerrar modal">&times;</button>
+
+      <div class="modal-body">
+
+        <!-- Portada del juego -->
+        <figure class="modal-cover-wrap">
+          <img id="modal-cover" src="" alt="">
+          <div class="modal-cover-overlay" aria-hidden="true"></div>
+          <figcaption class="modal-game-info">
+            <h2 id="modal-title"></h2>
+            <p class="modal-game-year" id="modal-year"></p>
+          </figcaption>
+        </figure>
+
+        <!-- Personajes y resumen -->
+        <div class="modal-details">
+          <h3>Personajes principales</h3>
+          <ul class="characters-list" id="modal-characters"></ul>
+
+          <aside class="modal-summary">
+            <h3>Resumen del juego</h3>
+            <p id="modal-summary-text"></p>
+          </aside>
+        </div>
+
+      </div><!-- /.modal-body -->
+    </article>
+  </div>
+
+  <!-- ══════════════════════════════════
+       PIE DE PÁGINA
+  ══════════════════════════════════ -->
+  <footer class="site-footer">
+    <div class="footer-grid">
+
+      <!-- Marca -->
+      <div class="footer-brand">
+        <h2>RESIDENT EVIL UNIVERSE</h2>
+        <p>Celebrando la historia del survival horror y los personajes que viven en nuestros corazones.</p>
+        <nav class="footer-socials" aria-label="Redes sociales">
+          <a href="#" title="Instagram" aria-label="Instagram">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          </a>
+          <a href="#" title="Facebook" aria-label="Facebook">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+          </a>
+          <a href="#" title="YouTube" aria-label="YouTube">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M23.495 6.205a3.007 3.007 0 0 0-2.088-2.088c-1.87-.501-9.396-.501-9.396-.501s-7.507-.01-9.396.501A3.007 3.007 0 0 0 .527 6.205a31.247 31.247 0 0 0-.522 5.805 31.247 31.247 0 0 0 .522 5.783 3.007 3.007 0 0 0 2.088 2.088c1.868.502 9.396.502 9.396.502s7.506 0 9.396-.502a3.007 3.007 0 0 0 2.088-2.088 31.247 31.247 0 0 0 .5-5.783 31.247 31.247 0 0 0-.5-5.805zM9.609 15.601V8.408l6.264 3.602z"/></svg>
+          </a>
+          <a href="#" title="X / Twitter" aria-label="X / Twitter">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+        </nav>
+      </div>
+
+      <!-- Explorar -->
+      <nav class="footer-col" aria-label="Explorar el sitio">
+        <h4>Explorar</h4>
+        <ul>
+          <li><a href="#">Inicio</a></li>
+          <li><a href="#historia">Historia</a></li>
+          <li><a href="#juegos">Juegos</a></li>
+          <li><a href="#cronologia">Cronología</a></li>
+        </ul>
+      </nav>
+
+      <!-- Personajes -->
+      <nav class="footer-col" aria-label="Personajes destacados">
+        <h4>Personajes</h4>
+        <ul>
+          <li><a href="#">Leon Kennedy</a></li>
+          <li><a href="#">Jill Valentine</a></li>
+          <li><a href="#">Chris Redfield</a></li>
+          <li><a href="#">Claire Redfield</a></li>
+        </ul>
+      </nav>
+
+      <!-- Legal -->
+      <nav class="footer-col" aria-label="Información legal">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Términos de uso</a></li>
+          <li><a href="#">Privacidad</a></li>
+          <li><a href="#">Cookies</a></li>
+        </ul>
+      </nav>
+
+    </div><!-- /.footer-grid -->
+
+    <hr class="footer-divider">
+
+    <div class="footer-bottom">
+      <p>© 2026 Resident Evil Universe · Fan page educativa · INACAP Maipú</p>
+      <p>Resident Evil es propiedad de Capcom Co., Ltd. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- Botón scroll al inicio -->
+  <button
+    class="scroll-top"
+    onclick="window.scrollTo({top:0,behavior:'smooth'})"
+    aria-label="Volver al inicio de la página"
+  >↑</button>
+
+  <!-- Script principal -->
+  <script src="js/main.js"></script>
+
+</body>
+</html>
