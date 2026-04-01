@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════════
    RESIDENT EVIL UNIVERSE — main.js
    Módulos:
-     1. Loader inicial
+     1. Loader inicial #eliminado
      2. Lluvia de sangre
      3. Carrusel 3D + partículas canvas
      4. Contadores animados
@@ -16,10 +16,6 @@
 ═══════════════════════════════════════════════ */
 
 'use strict';
-
-/* ══════════════════════════════════════════════
-   1. LOADER INICIAL
-
 
 /* ══════════════════════════════════════════════
    2. LLUVIA DE SANGRE
