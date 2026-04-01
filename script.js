@@ -19,14 +19,7 @@
 
 /* ══════════════════════════════════════════════
    1. LOADER INICIAL
-══════════════════════════════════════════════ */
-(function initLoader() {
-  const loader = document.getElementById('umbrella-loader');
-  window.addEventListener('load', () => {
-    loader.classList.add('hide');
-    loader.addEventListener('transitionend', () => loader.remove(), { once: true });
-  });
-})();
+
 
 /* ══════════════════════════════════════════════
    2. LLUVIA DE SANGRE
