@@ -1,37 +1,24 @@
 /* ═══════════════════════════════════════════════
    RESIDENT EVIL UNIVERSE — main.js  (optimizado)
    Módulos:
-     1. Loader inicial      — sin delay artificial 
-     2. Lluvia de sangre    — 30 gotas, 1 reflow, idle
-     3. Carrusel 3D         — partículas pausadas fuera de vista
-     4. Contadores animados — IntersectionObserver
-     5. Datos               — objeto central
-     6. Cards de juegos     — DocumentFragment
+     1. Loader inicial      #eliminado
+     2. Lluvia de sangre    
+     3. Carrusel 3D         
+     4. Contadores animados 
+     5. Datos              
+     6. Cards de juegos    
      7. Buscador
-     8. Cronología          — DocumentFragment
-     9. Villanos            — DocumentFragment
+     8. Cronología          
+     9. Villanos           
     10. Modal con loader
-    11. Luz de cursor       — throttle con rAF
+    11. Luz de cursor       
     12. Scroll suave de nav
 ═══════════════════════════════════════════════ */
 
 'use strict';
 
 /* ══════════════════════════════════════════════
-   1. LOADER INICIAL
-   Sin setTimeout: se cierra en cuanto window.load
-   dispara y la transición CSS hace el fade.
-══════════════════════════════════════════════ */
-(function initLoader() {
-  const loader = document.getElementById('umbrella-loader');
-  window.addEventListener('load', () => {
-    loader.classList.add('hide');
-    loader.addEventListener('transitionend', () => loader.remove(), { once: true });
-  });
-})();
-
-/* ══════════════════════════════════════════════
-   2. LLUVIA DE SANGRE
+   1. LLUVIA DE SANGRE
    30 gotas (era 55), creadas con DocumentFragment
    (1 solo reflow). Se inicializa en idle time.
 ══════════════════════════════════════════════ */
