@@ -20,31 +20,38 @@
 /* ══════════════════════════════════════════════
    1. LOADER INICIAL
 ══════════════════════════════════════════════ */
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    const loader = document.getElementById('umbrella-loader');
+(function initLoader() {
+  const loader = document.getElementById('umbrella-loader');
+  window.addEventListener('load', () => {
     loader.classList.add('hide');
-    setTimeout(() => loader.remove(), 700);
-  }, 1600);
-});
+    loader.addEventListener('transitionend', () => loader.remove(), { once: true });
+  });
+})();
 
 /* ══════════════════════════════════════════════
    2. LLUVIA DE SANGRE
 ══════════════════════════════════════════════ */
 (function initBloodRain() {
-  const rain  = document.getElementById('blood-rain');
-  const DROPS = 55;
+  function createDrops() {
+    const rain = document.getElementById('blood-rain');
+    const frag = document.createDocumentFragment();
+    for (let i = 0; i < 30; i++) {
+      const drop = document.createElement('div');
+      drop.classList.add('drop');
+      drop.style.cssText =
+        `left:${Math.random() * 100}%;` +
+        `height:${20 + Math.random() * 50}px;` +
+        `animation-duration:${2.5 + Math.random() * 4}s;` +
+        `animation-delay:${Math.random() * 6}s`;
+      frag.appendChild(drop);
+    }
+    rain.appendChild(frag);
+  }
 
-  for (let i = 0; i < DROPS; i++) {
-    const drop = document.createElement('div');
-    drop.classList.add('drop');
-    drop.style.cssText = [
-      `left:${Math.random() * 100}%`,
-      `height:${20 + Math.random() * 50}px`,
-      `animation-duration:${2.5 + Math.random() * 4}s`,
-      `animation-delay:${Math.random() * 6}s`,
-    ].join(';');
-    rain.appendChild(drop);
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(createDrops, { timeout: 1000 });
+  } else {
+    setTimeout(createDrops, 300);
   }
 })();
 
@@ -52,7 +59,7 @@ window.addEventListener('load', () => {
    3. CARRUSEL 3D + PARTÍCULAS CANVAS
 ══════════════════════════════════════════════ */
 (function initCarousel() {
-  const slides  = Array.from(document.querySelectorAll('.slide-3d'));
+  const slides   = Array.from(document.querySelectorAll('.slide-3d'));
   const dotsWrap = document.getElementById('dots3d');
   const canvas   = document.getElementById('carousel-canvas');
   const ctx      = canvas.getContext('2d');
@@ -61,27 +68,22 @@ window.addEventListener('load', () => {
   let current = 0;
   const total = slides.length;
 
-  /** Devuelve la clase CSS según posición relativa al slide activo */
   function getPositionClass(i) {
     const diff = (i - current + total) % total;
-    if (diff === 0)               return 'active';
-    if (diff === 1)               return 'right';
-    if (diff === total - 1)       return 'left';
+    if (diff === 0)                    return 'active';
+    if (diff === 1)                    return 'right';
+    if (diff === total - 1)            return 'left';
     if (diff <= Math.floor(total / 2)) return 'hidden-right';
     return 'hidden-left';
   }
 
-  /** Aplica clases y actualiza dots */
   function render() {
-    slides.forEach((s, i) => {
-      s.className = 'slide-3d ' + getPositionClass(i);
-    });
+    slides.forEach((s, i) => { s.className = 'slide-3d ' + getPositionClass(i); });
     document.querySelectorAll('.dots-3d span').forEach((d, i) => {
       d.classList.toggle('active', i === current);
     });
   }
 
-  /* Crear dots */
   slides.forEach((_, i) => {
     const dot = document.createElement('span');
     if (i === 0) dot.classList.add('active');
@@ -89,30 +91,24 @@ window.addEventListener('load', () => {
     dotsWrap.appendChild(dot);
   });
 
-  /* Botones prev / next */
   document.querySelector('.prev-3d').addEventListener('click', () => {
-    current = (current - 1 + total) % total;
-    render();
+    current = (current - 1 + total) % total; render();
   });
   document.querySelector('.next-3d').addEventListener('click', () => {
-    current = (current + 1) % total;
-    render();
+    current = (current + 1) % total; render();
   });
 
-  /* Click en slide lateral → pasar al centro */
   slides.forEach((s, i) => {
     s.addEventListener('click', () => {
       if (!s.classList.contains('active')) { current = i; render(); }
     });
   });
 
-  /* Auto-avance cada 5 s */
   setInterval(() => { current = (current + 1) % total; render(); }, 5000);
-
   render();
 
-  /* ── Partículas canvas ── */
-  const PARTICLE_COUNT = 55;
+  /* Partículas — se pausan fuera de la vista */
+  const PARTICLE_COUNT = 40;
   const particles = Array.from({ length: PARTICLE_COUNT }, () => ({
     x:     Math.random() * 580,
     y:     Math.random() * 340,
@@ -123,6 +119,9 @@ window.addEventListener('load', () => {
     color: Math.random() < 0.6 ? 'rgba(220,0,0,' : 'rgba(255,255,255,',
   }));
 
+  let rafId = null;
+  let visible = false;
+
   function drawParticles() {
     ctx.clearRect(0, 0, 580, 340);
     particles.forEach(p => {
@@ -130,21 +129,33 @@ window.addEventListener('load', () => {
       ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
       ctx.fillStyle = p.color + p.alpha + ')';
       ctx.fill();
-
-      p.x += p.vx;
-      p.y += p.vy;
+      p.x += p.vx; p.y += p.vy;
       if (p.x < 0)   p.x = 580;
       if (p.x > 580) p.x = 0;
       if (p.y < 0)   p.y = 340;
       if (p.y > 340) p.y = 0;
-
       p.alpha += (Math.random() - 0.5) * 0.03;
       p.alpha  = Math.max(0.05, Math.min(0.85, p.alpha));
     });
-    requestAnimationFrame(drawParticles);
+    if (visible) rafId = requestAnimationFrame(drawParticles);
   }
-  drawParticles();
+
+  // Pausar partículas cuando el carrusel no está visible
+  const carouselObserver = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      visible = e.isIntersecting;
+      if (visible && !rafId) {
+        rafId = requestAnimationFrame(drawParticles);
+      } else if (!visible && rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+    });
+  }, { threshold: 0.1 });
+
+  carouselObserver.observe(document.querySelector('.carousel-3d-wrap'));
 })();
+
 
 /* ══════════════════════════════════════════════
    4. CONTADORES ANIMADOS
@@ -447,9 +458,20 @@ const DATA = {
   const light = document.createElement('div');
   light.classList.add('light');
   document.body.appendChild(light);
+
+  let ticking = false;
+  let mx = 0, my = 0;
+
   document.addEventListener('mousemove', e => {
-    light.style.left = `${e.clientX - 150}px`;
-    light.style.top  = `${e.clientY - 150}px`;
+    mx = e.clientX; my = e.clientY;
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        light.style.left = `${mx - 150}px`;
+        light.style.top  = `${my - 150}px`;
+        ticking = false;
+      });
+      ticking = true;
+    }
   });
 })();
 
