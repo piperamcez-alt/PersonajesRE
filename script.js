@@ -1,24 +1,39 @@
 /* ═══════════════════════════════════════════════
-   RESIDENT EVIL UNIVERSE — main.js
+   RESIDENT EVIL UNIVERSE — main.js  (optimizado)
    Módulos:
-     1. Loader inicial #eliminado
-     2. Lluvia de sangre
-     3. Carrusel 3D + partículas canvas
-     4. Contadores animados
-     5. Datos (juegos, personajes, resúmenes, villanos)
-     6. Generación de cards
+     1. Loader inicial      — sin delay artificial 
+     2. Lluvia de sangre    — 30 gotas, 1 reflow, idle
+     3. Carrusel 3D         — partículas pausadas fuera de vista
+     4. Contadores animados — IntersectionObserver
+     5. Datos               — objeto central
+     6. Cards de juegos     — DocumentFragment
      7. Buscador
-     8. Cronología
-     9. Villanos
+     8. Cronología          — DocumentFragment
+     9. Villanos            — DocumentFragment
     10. Modal con loader
-    11. Luz de cursor
+    11. Luz de cursor       — throttle con rAF
     12. Scroll suave de nav
 ═══════════════════════════════════════════════ */
 
 'use strict';
 
 /* ══════════════════════════════════════════════
+   1. LOADER INICIAL
+   Sin setTimeout: se cierra en cuanto window.load
+   dispara y la transición CSS hace el fade.
+══════════════════════════════════════════════ */
+(function initLoader() {
+  const loader = document.getElementById('umbrella-loader');
+  window.addEventListener('load', () => {
+    loader.classList.add('hide');
+    loader.addEventListener('transitionend', () => loader.remove(), { once: true });
+  });
+})();
+
+/* ══════════════════════════════════════════════
    2. LLUVIA DE SANGRE
+   30 gotas (era 55), creadas con DocumentFragment
+   (1 solo reflow). Se inicializa en idle time.
 ══════════════════════════════════════════════ */
 (function initBloodRain() {
   function createDrops() {
@@ -46,6 +61,8 @@
 
 /* ══════════════════════════════════════════════
    3. CARRUSEL 3D + PARTÍCULAS CANVAS
+   — Partículas se pausan con IntersectionObserver
+     cuando el carrusel sale de la pantalla.
 ══════════════════════════════════════════════ */
 (function initCarousel() {
   const slides   = Array.from(document.querySelectorAll('.slide-3d'));
@@ -145,29 +162,27 @@
   carouselObserver.observe(document.querySelector('.carousel-3d-wrap'));
 })();
 
-
 /* ══════════════════════════════════════════════
    4. CONTADORES ANIMADOS
+   Solo arrancan cuando son visibles.
 ══════════════════════════════════════════════ */
 (function initCounters() {
-  function animateCount(el, target, duration = 1800) {
+  function animateCount(el, target, duration = 1600) {
     let start = null;
     function step(ts) {
       if (!start) start = ts;
-      const progress = Math.min((ts - start) / duration, 1);
-      el.textContent = Math.floor(progress * target);
-      if (progress < 1) requestAnimationFrame(step);
+      const p = Math.min((ts - start) / duration, 1);
+      el.textContent = Math.floor(p * target);
+      if (p < 1) requestAnimationFrame(step);
       else el.textContent = target;
     }
     requestAnimationFrame(step);
   }
 
   const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        document.querySelectorAll('.stat-number').forEach(n => {
-          animateCount(n, +n.dataset.target);
-        });
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        document.querySelectorAll('.stat-number').forEach(n => animateCount(n, +n.dataset.target));
         observer.disconnect();
       }
     });
@@ -182,12 +197,11 @@
 ══════════════════════════════════════════════ */
 const DATA = {
   juegos: [
-    'Resident Evil 0', 'Resident Evil 1', 'Resident Evil 2',
-    'Resident Evil 3', 'Code Veronica',   'Resident Evil 4',
-    'Resident Evil 5', 'Resident Evil 6', 'Resident Evil 7',
-    'Resident Evil Village', 'Resident Evil Requiem',
+    'Resident Evil 0','Resident Evil 1','Resident Evil 2',
+    'Resident Evil 3','Code Veronica','Resident Evil 4',
+    'Resident Evil 5','Resident Evil 6','Resident Evil 7',
+    'Resident Evil Village','Resident Evil Requiem',
   ],
-
   descripcion: [
     'Origen del virus T y Umbrella.',
     'Incidente en la mansión Spencer.',
@@ -201,9 +215,7 @@ const DATA = {
     'Ethan enfrenta horrores en una aldea.',
     'Nueva amenaza que pone a prueba a los sobrevivientes.',
   ],
-
   años: ['2002','1996','1998','1999','2000','2005','2009','2012','2017','2021','2025'],
-
   portadas: [
     'https://upload.wikimedia.org/wikipedia/en/c/c6/Rezerobox.jpg',
     'https://preview.redd.it/resident-evil-1-original-vs-remaster-v0-g38zjcaso2lf1.jpg?width=640&crop=smart&auto=webp&s=b595b64dee1bc5b4284acb63887c33362fcac28e',
@@ -217,7 +229,6 @@ const DATA = {
     'https://image.api.playstation.com/vulcan/ap/rnd/202101/0812/FkzwjnJknkrFlozkTdeQBMub.png',
     'https://www.kingspec.com/uploads/image/69ae25ca5cb1b.png',
   ],
-
   personajes: {
     'Resident Evil 0': [
       { nombre: 'Rebecca Chambers', rol: 'Médica del equipo Bravo de S.T.A.R.S.', img: 'https://arc-anglerfish-arc2-prod-copesa.s3.amazonaws.com/public/ETPG3ZZLWBCMTKPK6SK723HYS4.png' },
@@ -306,142 +317,142 @@ const DATA = {
 };
 
 /* ══════════════════════════════════════════════
-   6. GENERACIÓN DE CARDS DE JUEGOS
+   6. CARDS DE JUEGOS — DocumentFragment (1 reflow)
 ══════════════════════════════════════════════ */
 (function initGameCards() {
   const grid = document.getElementById('games-grid');
+  const frag = document.createDocumentFragment();
   DATA.juegos.forEach((nombre, i) => {
     const article = document.createElement('article');
     article.classList.add('game-card');
-    article.dataset.name = nombre.toLowerCase();
+    article.dataset.name  = nombre.toLowerCase();
     article.dataset.index = i;
     article.innerHTML = `
-      <img src="${DATA.portadas[i]}" alt="Portada de ${nombre}" loading="lazy">
+      <img src="${DATA.portadas[i]}" alt="Portada de ${nombre}" loading="lazy" width="250" height="220">
       <div class="game-card-content">
         <h3>${nombre}</h3>
         <p>${DATA.descripcion[i]}</p>
-      </div>
-    `;
-    grid.appendChild(article);
+      </div>`;
+    frag.appendChild(article);
   });
+  grid.appendChild(frag);
 })();
 
 /* ══════════════════════════════════════════════
    7. BUSCADOR
 ══════════════════════════════════════════════ */
 (function initSearch() {
-  const input = document.getElementById('searchInput');
-  input.addEventListener('input', function () {
-    const query = this.value.toLowerCase().trim();
+  document.getElementById('searchInput').addEventListener('input', function () {
+    const q = this.value.toLowerCase().trim();
     document.querySelectorAll('.game-card').forEach(card => {
-      card.classList.toggle('hidden', Boolean(query) && !card.dataset.name.includes(query));
+      card.classList.toggle('hidden', Boolean(q) && !card.dataset.name.includes(q));
     });
   });
 })();
 
 /* ══════════════════════════════════════════════
-   8. CRONOLOGÍA
+   8. CRONOLOGÍA — DocumentFragment (1 reflow)
 ══════════════════════════════════════════════ */
 (function initTimeline() {
   const timeline = document.getElementById('timeline');
+  const frag = document.createDocumentFragment();
   DATA.cronologia.forEach(item => {
-    const div = document.createElement('div');
-    div.classList.add('tl-item');
-    div.innerHTML = `
-      <div class="tl-card">
-        <h4>${item.titulo}</h4>
-        <p>${item.desc}</p>
-      </div>
+    const li = document.createElement('li');
+    li.classList.add('tl-item');
+    li.innerHTML = `
+      <div class="tl-card"><h4>${item.titulo}</h4><p>${item.desc}</p></div>
       <div class="tl-dot"><span class="tl-year">${item.año}</span></div>
-      <div aria-hidden="true" style="flex:0 0 calc(50% - 30px)"></div>
-    `;
-    timeline.appendChild(div);
+      <div aria-hidden="true" style="flex:0 0 calc(50% - 30px)"></div>`;
+    frag.appendChild(li);
   });
+  timeline.appendChild(frag);
 })();
 
 /* ══════════════════════════════════════════════
-   9. VILLANOS
+   9. VILLANOS — DocumentFragment (1 reflow)
 ══════════════════════════════════════════════ */
 (function initVillains() {
   const grid = document.getElementById('villains-grid');
+  const frag = document.createDocumentFragment();
   DATA.villanos.forEach(v => {
     const article = document.createElement('article');
     article.classList.add('villain-card');
     article.innerHTML = `
-      <img src="${v.img}" alt="${v.nombre}" loading="lazy"
+      <img src="${v.img}" alt="${v.nombre}" loading="lazy" width="200" height="200"
            onerror="this.src='https://placehold.co/200x200/1a0000/ff2e2e?text=RE'">
       <span class="villain-badge">${v.badge}</span>
       <h4>${v.nombre}</h4>
-      <span>${v.juego}</span>
-    `;
-    grid.appendChild(article);
+      <span>${v.juego}</span>`;
+    frag.appendChild(article);
   });
+  grid.appendChild(frag);
 })();
 
 /* ══════════════════════════════════════════════
    10. MODAL CON LOADER
 ══════════════════════════════════════════════ */
 (function initModal() {
-  const overlay    = document.getElementById('game-modal');
-  const loader     = document.getElementById('modal-loader');
-  const cover      = document.getElementById('modal-cover');
-  const titleEl    = document.getElementById('modal-title');
-  const yearEl     = document.getElementById('modal-year');
-  const charsList  = document.getElementById('modal-characters');
-  const summaryEl  = document.getElementById('modal-summary-text');
-  const closeBtn   = document.querySelector('.modal-close');
+  const overlay   = document.getElementById('game-modal');
+  const loader    = document.getElementById('modal-loader');
+  const cover     = document.getElementById('modal-cover');
+  const titleEl   = document.getElementById('modal-title');
+  const yearEl    = document.getElementById('modal-year');
+  const charsList = document.getElementById('modal-characters');
+  const summaryEl = document.getElementById('modal-summary-text');
+  const closeBtn  = document.querySelector('.modal-close');
+  let loaderTimer = null;
 
   function openModal(nombre, index) {
     overlay.style.display = 'flex';
     loader.classList.remove('hide');
-    cover.src = '';
-    titleEl.textContent = '';
-    yearEl.textContent  = '';
-    charsList.innerHTML = '';
-    summaryEl.textContent = '';
+    cover.src = ''; titleEl.textContent = '';
+    yearEl.textContent = ''; charsList.innerHTML = ''; summaryEl.textContent = '';
 
-    setTimeout(() => {
-      cover.src          = DATA.portadas[index];
-      cover.alt          = `Portada de ${nombre}`;
-      titleEl.textContent = nombre;
-      yearEl.textContent  = `Año: ${DATA.años[index]}`;
+    clearTimeout(loaderTimer);
+    loaderTimer = setTimeout(() => {
+      cover.src             = DATA.portadas[index];
+      cover.alt             = `Portada de ${nombre}`;
+      titleEl.textContent   = nombre;
+      yearEl.textContent    = `Año: ${DATA.años[index]}`;
       summaryEl.textContent = DATA.resumenes[nombre] || 'Resumen no disponible.';
 
+      const frag = document.createDocumentFragment();
       (DATA.personajes[nombre] || []).forEach(c => {
         const li = document.createElement('li');
         li.classList.add('character-item');
         li.innerHTML = `
-          <img src="${c.img}" alt="${c.nombre}"
+          <img src="${c.img}" alt="${c.nombre}" loading="lazy"
                onerror="this.src='https://placehold.co/64x64/1a0000/ff2e2e?text=RE'">
-          <div>
-            <h4>${c.nombre}</h4>
-            <p>${c.rol}</p>
-          </div>
-        `;
-        charsList.appendChild(li);
+          <div><h4>${c.nombre}</h4><p>${c.rol}</p></div>`;
+        frag.appendChild(li);
       });
-
+      charsList.appendChild(frag);
       loader.classList.add('hide');
-    }, 800);
+    }, 600); // 800 ms → 600 ms
   }
 
-  /* Delegación de eventos en el grid */
+  function closeModal() { overlay.style.display = 'none'; }
+
+  // Delegación de eventos (más eficiente que N listeners)
   document.getElementById('games-grid').addEventListener('click', e => {
     const card = e.target.closest('.game-card');
     if (!card) return;
-    const nombre = card.querySelector('h3').textContent;
-    const index  = +card.dataset.index;
-    openModal(nombre, index);
+    openModal(card.querySelector('h3').textContent, +card.dataset.index);
   });
 
-  closeBtn.addEventListener('click', () => { overlay.style.display = 'none'; });
-  overlay.addEventListener('click', e => {
-    if (e.target === overlay) overlay.style.display = 'none';
+  closeBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+
+  // Cerrar con Escape
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && overlay.style.display === 'flex') closeModal();
   });
 })();
 
 /* ══════════════════════════════════════════════
    11. LUZ DE CURSOR
+   Throttleada con rAF para no disparar en cada
+   pixel del mousemove.
 ══════════════════════════════════════════════ */
 (function initCursorLight() {
   const light = document.createElement('div');
